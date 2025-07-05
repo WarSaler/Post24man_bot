@@ -1,0 +1,171 @@
+{
+  "name": "Публикация новостей в Telegram",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "4905e00c-9b16-4d01-a3c8-137a4b3c3ca8",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 10,
+              "minute": 0
+            },
+            {
+              "hour": 14,
+              "minute": 0
+            },
+            {
+              "hour": 18,
+              "minute": 0
+            }
+          ]
+        }
+      },
+      "id": "e5ebdfd9-5b1f-4c2d-80df-667a69c820e4",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://bot:5000/api/publish_next",
+        "options": {}
+      },
+      "id": "3f9e3c8a-8534-41cf-8e73-3452f8a9cb45",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"success\"]}}",
+              "operation": "equal",
+              "value2": "true"
+            }
+          ]
+        }
+      },
+      "id": "abcf4c22-0e0d-46cd-aae0-7dc8e05c8408",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://bot:5000/api/notify_admin",
+        "options": {
+          "formData": {
+            "message": "Опубликована новая статья!"
+          }
+        }
+      },
+      "id": "46af9e69-15f6-4f5b-b37b-d3fc6c9bd1ea",
+      "name": "Success Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://bot:5000/api/notify_admin",
+        "options": {
+          "formData": {
+            "message": "Ошибка при публикации статьи"
+          }
+        }
+      },
+      "id": "f5232eea-e9bc-4f77-8894-e712059dc9e3",
+      "name": "Error Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Schedule Trigger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Success Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "1"
+} 
