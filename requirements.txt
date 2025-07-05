@@ -4,11 +4,9 @@ google-generativeai==0.3.2
 telethon==1.33.1
 Pillow==10.1.0
 python-dateutil==2.8.2
-SQLAlchemy==2.0.25
 pydantic==2.5.3
 loguru==0.7.2
 httpx==0.26.0
-psycopg2-binary==2.9.9
 gspread==6.2.1
 google-auth==2.40.3
 oauth2client==4.1.3

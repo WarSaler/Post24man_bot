@@ -9,7 +9,7 @@ Telegram-бот для автоматического сбора, перефра
 - Модерация новостей администратором бота
 - Автоматическая публикация одобренных новостей в целевой группе
 - Интеграция с n8n для автоматизации процессов
-- Поддержка двух видов хранения данных: PostgreSQL или Google Sheets
+- Хранение данных в Google Sheets
 
 ## Требования
 
@@ -17,7 +17,7 @@ Telegram-бот для автоматического сбора, перефра
 - API ключ для Google Gemini
 - Токен Telegram Bot API (от [@BotFather](https://t.me/BotFather))
 - API ID и API Hash для Telethon (от [my.telegram.org](https://my.telegram.org))
-- Для Google Sheets: ключ сервисного аккаунта Google (credentials.json)
+- Ключ сервисного аккаунта Google (credentials.json)
 - Docker и Docker Compose для контейнеризации (опционально)
 
 ## Установка и настройка
@@ -43,16 +43,35 @@ venv\Scripts\activate  # Для Windows
 pip install -r requirements.txt
 ```
 
-4. Создать файл `.env` на основе `.env.example`:
-```bash
-cp .env.example .env
-# Заполните необходимые параметры в .env файле
+4. Создать файл `.env` со следующими параметрами:
+```
+# Telegram Bot токены и настройки
+BOT_TOKEN=your_bot_token
+ADMIN_USER_IDS=123456789,987654321
+TARGET_GROUP_ID=-1001234567890
+
+# Настройки для Google Gemini API
+GEMINI_API_KEY=your_gemini_api_key
+
+# Настройки для Telethon (парсинг групп)
+TELEGRAM_API_ID=12345
+TELEGRAM_API_HASH=your_telegram_api_hash
+
+# Список групп для парсинга новостей
+SOURCE_GROUPS=@group1,@group2,@group3
+
+# Настройки для Google Sheets
+GOOGLE_SHEET_NAME=Post24man_Data
+SHARE_EMAIL=your_email@example.com
+
+# Настройки для регулярного парсинга
+PARSING_INTERVAL_MINUTES=60
 ```
 
-5. Если используется Google Sheets:
+5. Настройка Google Sheets:
    - Создайте сервисный аккаунт в [Google Cloud Console](https://console.cloud.google.com/)
+   - Включите API Google Sheets и Google Drive
    - Загрузите ключ JSON (credentials.json) и поместите его в папку `bot/credentials/`
-   - В `.env` файле установите `USE_GOOGLE_SHEETS=True`
    - Укажите название таблицы в `GOOGLE_SHEET_NAME` и email для доступа в `SHARE_EMAIL`
 
 6. Запустить бота:
@@ -89,24 +108,14 @@ Post24man_bot/
 │   ├── credentials/       # Директория для ключей Google API
 │   └── db/
 │       ├── __init__.py
-│       ├── database.py    # Работа с SQL базой данных
 │       ├── sheets_database.py # Работа с Google Sheets
-│       └── db_factory.py  # Фабрика для выбора типа БД
+│       └── db_factory.py  # Фабрика для базы данных
 ├── requirements.txt       # Зависимости проекта
 ├── Dockerfile             # Для запуска на Render
 ├── docker-compose.yml     # Для локального тестирования
 └── n8n/
     └── workflows/         # Файлы воркфлоу для n8n
 ```
-
-## Выбор типа базы данных
-
-Бот поддерживает два типа хранения данных:
-
-1. **PostgreSQL** (по умолчанию): Установите `USE_GOOGLE_SHEETS=False` в `.env` файле
-2. **Google Sheets**: Установите `USE_GOOGLE_SHEETS=True` в `.env` файле
-
-При использовании Google Sheets не требуется настройка PostgreSQL, данные будут храниться в таблице Google.
 
 ## Команды бота
 
@@ -123,9 +132,11 @@ Post24man_bot/
 2. Подключите свой GitHub репозиторий.
 3. Выберите тип "Docker".
 4. Добавьте переменные окружения из файла `.env`.
-5. При использовании Google Sheets:
-   - Добавьте переменную `GOOGLE_CREDENTIALS` с содержимым файла credentials.json (в формате Base64)
-   - В Dockerfile добавьте строку для декодирования и сохранения учетных данных
+5. Добавьте переменную `GOOGLE_CREDENTIALS` с содержимым файла credentials.json (в формате Base64).
+   Для конвертации файла в Base64 используйте:
+   ```
+   cat bot/credentials/credentials.json | base64
+   ```
 6. Нажмите "Create Web Service".
 
 ## Лицензия

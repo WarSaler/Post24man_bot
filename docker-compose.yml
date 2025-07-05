@@ -9,7 +9,6 @@ services:
     environment:
       - TZ=Europe/Moscow
       # Настройки для Google Sheets
-      - USE_GOOGLE_SHEETS=True
       - GOOGLE_SHEET_NAME=Post24man_Data
       # Другие переменные окружения загружаются из .env файла
     env_file:

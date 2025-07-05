@@ -1,11 +1,6 @@
 from ..config import config
 
-# Импортируем классы баз данных
-try:
-    from .database import db as sql_db
-except ImportError:
-    sql_db = None
-
+# Импортируем только Google Sheets
 try:
     from .sheets_database import db as sheets_db
 except ImportError:
@@ -13,14 +8,13 @@ except ImportError:
 
 def get_db():
     """
-    Функция возвращает экземпляр базы данных в зависимости от конфигурации
+    Функция возвращает экземпляр базы данных Google Sheets
     """
-    if config.USE_GOOGLE_SHEETS and sheets_db is not None:
+    if sheets_db is not None:
         print("Используется Google Sheets в качестве базы данных")
         return sheets_db
     else:
-        print("Используется SQL база данных")
-        return sql_db
+        raise ImportError("Не удалось импортировать модуль Google Sheets")
 
 # Экспортируем экземпляр базы данных
 db = get_db() 
