@@ -9,6 +9,7 @@ Telegram-бот для автоматического сбора, перефра
 - Модерация новостей администратором бота
 - Автоматическая публикация одобренных новостей в целевой группе
 - Интеграция с n8n для автоматизации процессов
+- Поддержка двух видов хранения данных: PostgreSQL или Google Sheets
 
 ## Требования
 
@@ -16,6 +17,7 @@ Telegram-бот для автоматического сбора, перефра
 - API ключ для Google Gemini
 - Токен Telegram Bot API (от [@BotFather](https://t.me/BotFather))
 - API ID и API Hash для Telethon (от [my.telegram.org](https://my.telegram.org))
+- Для Google Sheets: ключ сервисного аккаунта Google (credentials.json)
 - Docker и Docker Compose для контейнеризации (опционально)
 
 ## Установка и настройка
@@ -47,7 +49,13 @@ cp .env.example .env
 # Заполните необходимые параметры в .env файле
 ```
 
-5. Запустить бота:
+5. Если используется Google Sheets:
+   - Создайте сервисный аккаунт в [Google Cloud Console](https://console.cloud.google.com/)
+   - Загрузите ключ JSON (credentials.json) и поместите его в папку `bot/credentials/`
+   - В `.env` файле установите `USE_GOOGLE_SHEETS=True`
+   - Укажите название таблицы в `GOOGLE_SHEET_NAME` и email для доступа в `SHARE_EMAIL`
+
+6. Запустить бота:
 ```bash
 python run_bot.py
 ```
@@ -78,15 +86,27 @@ Post24man_bot/
 │   ├── news_parser.py     # Парсинг новостей из других групп
 │   ├── gemini_helper.py   # Интеграция с Google Gemini API
 │   ├── message_handler.py # Обработка сообщений
+│   ├── credentials/       # Директория для ключей Google API
 │   └── db/
 │       ├── __init__.py
-│       └── database.py    # Работа с базой данных
+│       ├── database.py    # Работа с SQL базой данных
+│       ├── sheets_database.py # Работа с Google Sheets
+│       └── db_factory.py  # Фабрика для выбора типа БД
 ├── requirements.txt       # Зависимости проекта
 ├── Dockerfile             # Для запуска на Render
 ├── docker-compose.yml     # Для локального тестирования
 └── n8n/
     └── workflows/         # Файлы воркфлоу для n8n
 ```
+
+## Выбор типа базы данных
+
+Бот поддерживает два типа хранения данных:
+
+1. **PostgreSQL** (по умолчанию): Установите `USE_GOOGLE_SHEETS=False` в `.env` файле
+2. **Google Sheets**: Установите `USE_GOOGLE_SHEETS=True` в `.env` файле
+
+При использовании Google Sheets не требуется настройка PostgreSQL, данные будут храниться в таблице Google.
 
 ## Команды бота
 
@@ -103,7 +123,10 @@ Post24man_bot/
 2. Подключите свой GitHub репозиторий.
 3. Выберите тип "Docker".
 4. Добавьте переменные окружения из файла `.env`.
-5. Нажмите "Create Web Service".
+5. При использовании Google Sheets:
+   - Добавьте переменную `GOOGLE_CREDENTIALS` с содержимым файла credentials.json (в формате Base64)
+   - В Dockerfile добавьте строку для декодирования и сохранения учетных данных
+6. Нажмите "Create Web Service".
 
 ## Лицензия
 

@@ -21,8 +21,13 @@ class Config(BaseModel):
     # Список групп для парсинга новостей
     SOURCE_GROUPS: list[str] = [group.strip() for group in os.getenv("SOURCE_GROUPS", "").split(",") if group.strip()]
     
-    # Настройки базы данных
+    # Настройки базы данных (PostgreSQL)
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./bot_data.db")
+    
+    # Настройки для Google Sheets
+    USE_GOOGLE_SHEETS: bool = os.getenv("USE_GOOGLE_SHEETS", "True").lower() in ('true', '1', 't')
+    GOOGLE_SHEET_NAME: str = os.getenv("GOOGLE_SHEET_NAME", "Post24man_Data")
+    SHARE_EMAIL: str = os.getenv("SHARE_EMAIL", "")
     
     # Настройки для регулярного парсинга
     PARSING_INTERVAL_MINUTES: int = int(os.getenv("PARSING_INTERVAL_MINUTES", "60"))

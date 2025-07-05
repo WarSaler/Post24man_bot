@@ -12,12 +12,25 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Копируем код приложения
 COPY . .
 
+# Создаем директорию для учетных данных Google
+RUN mkdir -p /app/bot/credentials
+
+# Добавляем скрипт для декодирования учетных данных Google
+RUN echo '#!/bin/sh\n\
+if [ -n "$GOOGLE_CREDENTIALS" ]; then\n\
+  echo $GOOGLE_CREDENTIALS | base64 -d > /app/bot/credentials/credentials.json\n\
+  echo "Учетные данные Google сохранены"\n\
+fi\n\
+exec "$@"' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
+
 # Создаем пользователя с ограниченными правами
 RUN adduser --disabled-password --gecos "" appuser
+RUN chown -R appuser:appuser /app/bot/credentials
 USER appuser
 
 # Создаем том для данных
 VOLUME /app/data
 
-# Запускаем бота
+# Запускаем бота через entrypoint скрипт
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["python", "run_bot.py"] 

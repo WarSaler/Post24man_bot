@@ -5,7 +5,8 @@ from aiogram.fsm.context import FSMContext
 from loguru import logger
 
 from .config import config
-from .db.database import db
+# Используем фабрику базы данных вместо прямого импорта
+from .db import db
 
 # Создаем роутер для обработки сообщений
 router = Router()
