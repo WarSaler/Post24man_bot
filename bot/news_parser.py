@@ -5,7 +5,7 @@ import asyncio
 from datetime import datetime, timedelta
 
 from .config import config
-from .db.database import db
+from .db import db
 from .gemini_helper import gemini_helper
 
 class NewsParser:

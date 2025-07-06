@@ -15,10 +15,13 @@ COPY . .
 # Создаем директорию для учетных данных Google
 RUN mkdir -p /app/bot/credentials
 
-# Добавляем скрипт для декодирования учетных данных Google
+# Добавляем скрипт для декодирования учетных данных Google с улучшенной обработкой
 RUN echo '#!/bin/sh\n\
 if [ -n "$GOOGLE_CREDENTIALS" ]; then\n\
-  echo $GOOGLE_CREDENTIALS | base64 -d > /app/bot/credentials/credentials.json\n\
+  # Удаляем любые переносы строк в base64\n\
+  CLEANED_CREDS=$(echo "$GOOGLE_CREDENTIALS" | tr -d "\\n\\r")\n\
+  # Декодируем очищенную строку\n\
+  echo "$CLEANED_CREDS" | base64 -d > /app/bot/credentials/credentials.json\n\
   echo "Учетные данные Google сохранены"\n\
 fi\n\
 exec "$@"' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh

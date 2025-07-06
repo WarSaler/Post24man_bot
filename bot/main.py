@@ -9,6 +9,7 @@ from loguru import logger
 from .config import config
 from .message_handler import router as message_router
 from .news_parser import news_parser
+from .db import db
 
 # Настройка логирования
 logger.remove()
@@ -49,8 +50,6 @@ async def publish_approved_news():
     """
     Публикует одобренные новости в целевую группу
     """
-    from .db.database import db
-    
     while True:
         try:
             # Получаем одобренные, но неопубликованные новости
